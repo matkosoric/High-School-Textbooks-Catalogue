@@ -10,4 +10,9 @@ public interface TextbookService {
     List<Textbook> findAll();
 
     Optional<Textbook> getTextbookById (Long id);
+
+    Textbook saveTextbook (Textbook textbook);
+
+    Boolean existsById (long id);
+
 }
