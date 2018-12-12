@@ -13,22 +13,31 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/textbooks")
 public class TextbookController {
 
     @Autowired
     private TextbookService textbookService;
 
-    @GetMapping("/textbooks")
+    @GetMapping("/")
     public List<Textbook> allTextbooks() {
         return textbookService.findAll();
     }
 
-    @GetMapping("/textbooks/{id}")
-    Optional<Textbook> getTextbookById(@PathVariable Long id) {
-        return textbookService.getTextbookById(id);
+    @GetMapping("/{id}")
+    ResponseEntity<?> getTextbookById(@PathVariable Long id) {
+
+        if (!textbookService.existsById(id)) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("HTTP/1.1 " + HttpStatus.NOT_FOUND.value() + " " + HttpStatus.NOT_FOUND.name());}
+
+        return ResponseEntity
+                .ok()
+                .body(textbookService.getTextbookById(id));
     }
 
-    @PostMapping ("/textbooks/new")
+    @PostMapping ("/new")
     public ResponseEntity<?> addTextbook (@Valid @RequestBody Textbook textbook, final BindingResult binding) {
         if (binding.hasErrors()) {
             return ResponseEntity
@@ -43,11 +52,11 @@ public class TextbookController {
         }
 
         return ResponseEntity
-                        .ok()
+                        .status(HttpStatus.CREATED)
                         .body(textbookService.saveTextbook(textbook));
     }
 
-    @PostMapping ("/textbooks/edit/{id}")
+    @PostMapping ("/edit/{id}")
     public ResponseEntity<?> editTextbook (@Valid @RequestBody Textbook textbook, @PathVariable Long id, final BindingResult binding) {
 
         if (binding.hasErrors()) {
@@ -56,15 +65,21 @@ public class TextbookController {
                     .body(binding.getFieldError().getDefaultMessage());
         }
 
+        if (textbook.getId() != id) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body ("HTTP/1.1 " + HttpStatus.BAD_REQUEST.value() + " " + HttpStatus.BAD_REQUEST.name());
+        }
+
         if (!textbookService.existsById(textbook.getId())) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body("HTTP/1.1 " + HttpStatus.NOT_FOUND.value() + " " + HttpStatus.NOT_FOUND.name());
         }
 
-            return ResponseEntity
-                    .ok()
-                    .body(textbookService.saveTextbook(textbook));
+        return ResponseEntity
+                .ok()
+                .body(textbookService.saveTextbook(textbook));
         }
 
     }
