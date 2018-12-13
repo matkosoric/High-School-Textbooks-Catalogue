@@ -1,8 +1,7 @@
 package edu.matko.soric.textbooks.services;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import edu.matko.soric.textbooks.entities.Textbook;
 import edu.matko.soric.textbooks.dao.TextbookRepository;
+import edu.matko.soric.textbooks.entities.Textbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +14,8 @@ public class TextbookServiceImpl implements TextbookService {
 
     @Autowired
     private TextbookRepository textbookRepository;
+
+
 
     @Override
     public List<Textbook> findAll() {

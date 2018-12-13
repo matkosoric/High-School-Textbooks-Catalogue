@@ -1,11 +1,15 @@
 package edu.matko.soric.textbooks.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "textbooks")
 public class Textbook {
 
+    @NotNull
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;

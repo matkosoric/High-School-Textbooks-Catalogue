@@ -42,7 +42,7 @@ public class TextbookController {
         if (binding.hasErrors()) {
             return ResponseEntity
                     .badRequest()
-                    .body(binding.getFieldError().getDefaultMessage());
+                    .body("HTTP/1.1 " + HttpStatus.BAD_REQUEST.value() + " " + HttpStatus.BAD_REQUEST.name() + "\n" + binding.getFieldError().getDefaultMessage());
         }
 
         if (textbookService.existsById(textbook.getId())) {
