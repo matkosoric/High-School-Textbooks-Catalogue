@@ -2,8 +2,8 @@ package edu.matko.soric.textbooks.controllers;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import edu.matko.soric.textbooks.TextbooksCatalogueApp;
-import edu.matko.soric.textbooks.dao.TextbookRepository;
 import edu.matko.soric.textbooks.entities.Textbook;
 import edu.matko.soric.textbooks.services.TextbookService;
 import org.json.JSONObject;
@@ -28,9 +28,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-//import edu.matko.soric.textbooks.utils.TextbookUtils;
-
-
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TextbooksCatalogueApp.class)
 public class TextbookControllerTest {
@@ -43,11 +40,7 @@ public class TextbookControllerTest {
     @Autowired
     private TextbookService textbookService;
 
-    @Autowired
-    private TextbookRepository textbookRepository;
-
-//    @Autowired
-//    TextbookUtils textbookUtils;
+    Random rand = new Random();
     Textbook randomTextbook;
     Integer nonexistingId = 0;
 
@@ -75,9 +68,8 @@ public class TextbookControllerTest {
     @Test
     public void getOneTextbook() throws Exception {
 
-        Random rand2 = new Random();
         List<Textbook> textbookList = textbookService.findAll();
-        Textbook randomTextbook = textbookList.get(rand2.nextInt(textbookList.size()));
+        randomTextbook = textbookList.get(rand.nextInt(textbookList.size()));
 
         mockMvc.perform(
                 get("/textbooks/" + randomTextbook.getId())
@@ -92,7 +84,6 @@ public class TextbookControllerTest {
     @Test
     public void nonExistingTextbook() throws Exception {
 
-        Random rand = new Random();
         List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
         while (! (nonexistingId > 0)) {
             if(!exclude.contains(rand))
@@ -111,20 +102,11 @@ public class TextbookControllerTest {
     @Test
     public void newTextbookMalformedRequest() throws Exception {
 
-        JSONObject json = new JSONObject();
-        json.put("title", "KNJIŽEVNOST 1 : čitanka za 1. razred četverogodišnjih strukovnih škola");
-        json.put("author", "Matko Sorić");
-        json.put("category", "udžbenik");
-        json.put("grade", "1");
-        json.put("publisher", "ALFA");
-        json.put("edition", null);
-        json.put("price", 90);
-
         mockMvc.perform(
                 post("/textbooks/new")
                 .contextPath(contextPath)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(json.toString()))
+                .content(JsonObjectsHelper.malformedJSON().toString()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType("text/plain;charset=UTF-8"));
@@ -134,33 +116,46 @@ public class TextbookControllerTest {
     @Test
     public void newTextbookExistingId() throws Exception {
 
-        JSONObject json = new JSONObject();
-        json.put("title", "KNJIŽEVNOST 1 : čitanka za 1. razred četverogodišnjih strukovnih škola");
-        json.put("author", "Matko Sorić");
-        json.put("category", "udžbenik");
-        json.put("grade", "1");
-        json.put("publisher", "ALFA");
-        json.put("edition", null);
-        json.put("price", 90);
+        List<Textbook> textbookList = textbookService.findAll();
+        Textbook randomTextbook = textbookList.get(rand.nextInt(textbookList.size()));
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        String existingTextbookJSON = ow.writeValueAsString(randomTextbook);
 
         mockMvc.perform(
                 post("/textbooks/new")
                         .contextPath(contextPath)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json.toString()))
+                        .content(existingTextbookJSON))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().contentType("text/plain;charset=UTF-8"));
-
-
     }
 
 
     @Test
     public void newTextbook() throws Exception {
 
+        List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
+        while (! (nonexistingId > 0)) {
+            if(!exclude.contains(rand))
+                nonexistingId = rand.nextInt();
+        }
+
+        JSONObject newTextbookJSON = JsonObjectsHelper.customIdTextbookJSON(nonexistingId);
+
+        mockMvc.perform(
+                post("/textbooks/new")
+                        .contextPath(contextPath)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(newTextbookJSON.toString()))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType("application/json;charset=UTF-8"));
 
     }
+
+
+
 
 
 }
