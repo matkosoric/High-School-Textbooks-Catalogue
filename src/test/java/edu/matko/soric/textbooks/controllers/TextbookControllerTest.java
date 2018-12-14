@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -239,6 +240,55 @@ public class TextbookControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+    }
+
+    @Test
+    public void deleteTextbookNonexistingId() throws Exception {
+
+        List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
+        while (!(nonexistingId > 0)) {
+            if (!exclude.contains(rand))
+                nonexistingId = rand.nextInt();
+        }
+
+        mockMvc.perform(
+                delete("/textbooks/edit/" + nonexistingId)
+                        .contextPath(contextPath))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.TEXT_PLAIN));
+
+    }
+
+
+    @Test
+    public void deleteTextbookGoodRequest() throws Exception {
+
+        //first, create instance for deletion
+        List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
+        while (! (nonexistingId > 0)) {
+            if(!exclude.contains(rand))
+                nonexistingId = rand.nextInt();
+        }
+
+        JSONObject newTextbookJSON = JsonObjectsHelper.customIdTextbookJSON(nonexistingId);
+
+        mockMvc.perform(
+                post("/textbooks/new")
+                        .contextPath(contextPath)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(newTextbookJSON.toString()))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+
+        //delete
+        mockMvc.perform(
+                delete("/textbooks/edit/" + newTextbookJSON.get("id"))
+                        .contextPath(contextPath))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
+
     }
 
 }
