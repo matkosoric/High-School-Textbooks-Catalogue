@@ -4,6 +4,7 @@ import edu.matko.soric.textbooks.entities.Textbook;
 import edu.matko.soric.textbooks.services.TextbookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -59,26 +60,23 @@ public class TextbookController {
     @PostMapping ("/edit/{id}")
     public ResponseEntity<?> editTextbook (@Valid @RequestBody Textbook textbook, @PathVariable Long id, final BindingResult binding) {
 
-        if (binding.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(binding.getFieldError().getDefaultMessage());
-        }
-
-        if (textbook.getId() != id) {
+        if ((!textbook.getId().equals(id)) || (binding.hasErrors())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.TEXT_PLAIN)
                     .body ("HTTP/1.1 " + HttpStatus.BAD_REQUEST.value() + " " + HttpStatus.BAD_REQUEST.name());
         }
 
         if (!textbookService.existsById(textbook.getId())) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.TEXT_PLAIN)
                     .body("HTTP/1.1 " + HttpStatus.NOT_FOUND.value() + " " + HttpStatus.NOT_FOUND.name());
         }
 
         return ResponseEntity
                 .ok()
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(textbookService.saveTextbook(textbook));
         }
 

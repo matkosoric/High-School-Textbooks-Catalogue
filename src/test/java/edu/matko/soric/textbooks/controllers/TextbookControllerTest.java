@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -58,7 +59,7 @@ public class TextbookControllerTest {
         mockMvc.perform(
                 get("/textbooks")
                 .contextPath(contextPath)
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -74,7 +75,7 @@ public class TextbookControllerTest {
         mockMvc.perform(
                 get("/textbooks/" + randomTextbook.getId())
                 .contextPath(contextPath)
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -93,10 +94,10 @@ public class TextbookControllerTest {
         mockMvc.perform(
                 get("/textbooks/" + nonexistingId)
                 .contextPath(contextPath)
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(content().contentType("text/plain;charset=UTF-8"));
+                .andExpect(content().contentType(MediaType.TEXT_PLAIN + ";charset=UTF-8"));
     }
 
     @Test
@@ -105,11 +106,11 @@ public class TextbookControllerTest {
         mockMvc.perform(
                 post("/textbooks/new")
                 .contextPath(contextPath)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(JsonObjectsHelper.malformedJSON().toString()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType("text/plain;charset=UTF-8"));
+                .andExpect(content().contentType(MediaType.TEXT_PLAIN + ";charset=UTF-8"));
 
     }
 
@@ -124,11 +125,11 @@ public class TextbookControllerTest {
         mockMvc.perform(
                 post("/textbooks/new")
                         .contextPath(contextPath)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(existingTextbookJSON))
                 .andDo(print())
                 .andExpect(status().isConflict())
-                .andExpect(content().contentType("text/plain;charset=UTF-8"));
+                .andExpect(content().contentType(MediaType.TEXT_PLAIN + ";charset=UTF-8"));
     }
 
 
@@ -146,16 +147,98 @@ public class TextbookControllerTest {
         mockMvc.perform(
                 post("/textbooks/new")
                         .contextPath(contextPath)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(newTextbookJSON.toString()))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType("application/json;charset=UTF-8"));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
 
     }
 
 
+    @Test
+    public void editTextbookMalformedRequestWronPathPathExistingObject() throws Exception {
+
+        List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
+        while (! (nonexistingId > 0)) {
+            if(!exclude.contains(rand))
+                nonexistingId = rand.nextInt();
+        }
+
+        List<Textbook> textbookList = textbookService.findAll();
+        Textbook randomTextbook = textbookList.get(rand.nextInt(textbookList.size()));
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        String existingTextbookJSON = ow.writeValueAsString(randomTextbook);
+
+        mockMvc.perform(
+                post("/textbooks/edit/" + nonexistingId)
+                        .contextPath(contextPath)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(existingTextbookJSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.TEXT_PLAIN));
+
+    }
 
 
+    @Test
+    public void editTextbookMalformedRequestWrongPathWrongObjectMatchingId() throws Exception {
+
+        List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
+        while (!(nonexistingId > 0)) {
+            if (!exclude.contains(rand))
+                nonexistingId = rand.nextInt();
+        }
+
+        JSONObject nonExistingTextbookJSON = JsonObjectsHelper.customIdTextbookJSON(nonexistingId);
+
+        mockMvc.perform(
+                post("/textbooks/edit/" + nonExistingTextbookJSON.get("id"))
+                        .contextPath(contextPath)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(nonExistingTextbookJSON.toString()))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.TEXT_PLAIN));
+    }
+
+
+    @Test
+    public void editTextbookMalformedRequestGoodPathGoodObjectIdMismatch() throws Exception {
+
+        List<Textbook> textbookList = textbookService.findAll();
+        Textbook randomTextbook = textbookList.get(rand.nextInt(textbookList.size()));
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        Textbook randomTextbook2 = textbookList.get(rand.nextInt(textbookList.size()));
+        String randomTextbookJSON2 = ow.writeValueAsString(randomTextbook2);
+
+        mockMvc.perform(
+                post("/textbooks/edit/" + randomTextbook.getId())
+                        .contextPath(contextPath)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(randomTextbookJSON2))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.TEXT_PLAIN));
+    }
+
+    @Test
+    public void editTextbookGoodRequest() throws Exception {
+
+        List<Textbook> textbookList = textbookService.findAll();
+        Textbook randomTextbook = textbookList.get(rand.nextInt(textbookList.size()));
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        String randomTextbookJSON = ow.writeValueAsString(randomTextbook);
+
+        mockMvc.perform(
+                post("/textbooks/edit/" + randomTextbook.getId())
+                        .contextPath(contextPath)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(randomTextbookJSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+    }
 
 }
