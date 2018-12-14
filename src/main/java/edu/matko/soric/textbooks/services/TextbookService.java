@@ -15,4 +15,5 @@ public interface TextbookService {
 
     Boolean existsById (long id);
 
+    void deleteTextbook(Long id);
 }

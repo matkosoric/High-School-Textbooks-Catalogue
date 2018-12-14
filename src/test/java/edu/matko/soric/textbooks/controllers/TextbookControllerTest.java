@@ -284,7 +284,7 @@ public class TextbookControllerTest {
 
         //delete
         mockMvc.perform(
-                delete("/textbooks/edit/" + newTextbookJSON.get("id"))
+                delete("/textbooks/" + newTextbookJSON.get("id"))
                         .contextPath(contextPath))
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.NO_CONTENT.value()));

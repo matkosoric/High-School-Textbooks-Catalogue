@@ -80,4 +80,23 @@ public class TextbookController {
                 .body(textbookService.saveTextbook(textbook));
         }
 
-    }
+
+        @DeleteMapping("/delete/{id}")
+        public ResponseEntity<?> deleteTextbook (@Valid @PathVariable Long id) {
+
+            if (!textbookService.existsById(id)) {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .body("HTTP/1.1 " + HttpStatus.NOT_FOUND.value() + " " + HttpStatus.NOT_FOUND.name());
+            }
+
+            textbookService.deleteTextbook(id);
+
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .body(null);
+        }
+
+        }

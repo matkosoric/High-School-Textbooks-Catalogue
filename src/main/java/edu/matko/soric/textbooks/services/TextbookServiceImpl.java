@@ -43,4 +43,10 @@ public class TextbookServiceImpl implements TextbookService {
         return textbookRepository.existsById(id);
     }
 
+    @Override
+    public void deleteTextbook(Long id) {
+        textbookRepository.deleteById(id);
+    }
+
+
 }
