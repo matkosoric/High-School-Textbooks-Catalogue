@@ -252,10 +252,10 @@ public class TextbookControllerTest {
         }
 
         mockMvc.perform(
-                delete("/textbooks/edit/" + nonexistingId)
+                delete("/textbooks/delete/" + nonexistingId)
                         .contextPath(contextPath))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(content().contentType(MediaType.TEXT_PLAIN));
 
     }
@@ -284,7 +284,7 @@ public class TextbookControllerTest {
 
         //delete
         mockMvc.perform(
-                delete("/textbooks/" + newTextbookJSON.get("id"))
+                delete("/textbooks/delete/" + newTextbookJSON.get("id"))
                         .contextPath(contextPath))
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
