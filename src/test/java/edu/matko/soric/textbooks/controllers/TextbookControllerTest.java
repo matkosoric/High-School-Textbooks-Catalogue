@@ -97,8 +97,7 @@ public class TextbookControllerTest {
                 .contextPath(contextPath)
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andDo(print())
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN + ";charset=UTF-8"));
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -110,8 +109,7 @@ public class TextbookControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(JsonObjectsHelper.malformedJSON().toString()))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN + ";charset=UTF-8"));
+                .andExpect(status().isBadRequest());
 
     }
 
@@ -129,8 +127,7 @@ public class TextbookControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(existingTextbookJSON))
                 .andDo(print())
-                .andExpect(status().isConflict())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN + ";charset=UTF-8"));
+                .andExpect(status().isConflict());
     }
 
 
@@ -177,9 +174,7 @@ public class TextbookControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(existingTextbookJSON))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN));
-
+                .andExpect(status().isBadRequest());
     }
 
 
@@ -200,8 +195,7 @@ public class TextbookControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(nonExistingTextbookJSON.toString()))
                 .andDo(print())
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN));
+                .andExpect(status().isNotFound());
     }
 
 
@@ -220,8 +214,7 @@ public class TextbookControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(randomTextbookJSON2))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -255,8 +248,7 @@ public class TextbookControllerTest {
                 delete("/textbooks/delete/" + nonexistingId)
                         .contextPath(contextPath))
                 .andDo(print())
-                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN));
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
     }
 

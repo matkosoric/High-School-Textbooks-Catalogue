@@ -1,5 +1,6 @@
 package edu.matko.soric.textbooks.controllers;
 
+import edu.matko.soric.textbooks.exceptions.*;
 import edu.matko.soric.textbooks.entities.Textbook;
 import edu.matko.soric.textbooks.services.TextbookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/textbooks")
@@ -25,13 +25,11 @@ public class TextbookController {
         return textbookService.findAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     ResponseEntity<?> getTextbookById(@PathVariable Long id) {
 
         if (!textbookService.existsById(id)) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("HTTP/1.1 " + HttpStatus.NOT_FOUND.value() + " " + HttpStatus.NOT_FOUND.name());}
+            throw new TextbookNotFoundException(id.toString());}
 
         return ResponseEntity
                 .ok()
@@ -41,62 +39,53 @@ public class TextbookController {
     @PostMapping ("/new")
     public ResponseEntity<?> addTextbook (@Valid @RequestBody Textbook textbook, final BindingResult binding) {
         if (binding.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("HTTP/1.1 " + HttpStatus.BAD_REQUEST.value() + " " + HttpStatus.BAD_REQUEST.name() + "\n" + binding.getFieldError().getDefaultMessage());
+            throw new ValidationException(binding.getFieldError().getDefaultMessage());
         }
 
         if (textbookService.existsById(textbook.getId())) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body("HTTP/1.1 " + HttpStatus.CONFLICT.value() + " " + HttpStatus.CONFLICT.name());
+            throw new TextbookConflictException();
         }
 
         return ResponseEntity
-                        .status(HttpStatus.CREATED)
-                        .body(textbookService.saveTextbook(textbook));
+                .status(HttpStatus.CREATED)
+                .body(textbookService.saveTextbook(textbook));
     }
 
     @PostMapping ("/edit/{id}")
     public ResponseEntity<?> editTextbook (@Valid @RequestBody Textbook textbook, @PathVariable Long id, final BindingResult binding) {
 
-        if ((!textbook.getId().equals(id)) || (binding.hasErrors())) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .contentType(MediaType.TEXT_PLAIN)
-                    .body ("HTTP/1.1 " + HttpStatus.BAD_REQUEST.value() + " " + HttpStatus.BAD_REQUEST.name());
+        if (binding.hasErrors()) {
+            throw new ValidationException(binding.getFieldError().getDefaultMessage());
+        }
+
+        if ((!textbook.getId().equals(id))) {
+            throw new TextbookIdMismatchException();
         }
 
         if (!textbookService.existsById(textbook.getId())) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .contentType(MediaType.TEXT_PLAIN)
-                    .body("HTTP/1.1 " + HttpStatus.NOT_FOUND.value() + " " + HttpStatus.NOT_FOUND.name());
+            throw new TextbookNotFoundException(id.toString());
         }
 
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(textbookService.saveTextbook(textbook));
+    }
+
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteTextbook (@Valid @PathVariable Long id) {
+
+        if (!textbookService.existsById(id)) {
+            throw new TextbookNotFoundException(id.toString());
         }
 
+        textbookService.deleteTextbook(id);
 
-        @DeleteMapping("/delete/{id}")
-        public ResponseEntity<?> deleteTextbook (@Valid @PathVariable Long id) {
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .body(null);
+    }
 
-            if (!textbookService.existsById(id)) {
-                return ResponseEntity
-                        .status(HttpStatus.NOT_FOUND)
-                        .contentType(MediaType.TEXT_PLAIN)
-                        .body("HTTP/1.1 " + HttpStatus.NOT_FOUND.value() + " " + HttpStatus.NOT_FOUND.name());
-            }
-
-            textbookService.deleteTextbook(id);
-
-            return ResponseEntity
-                    .status(HttpStatus.NO_CONTENT)
-                    .contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .body(null);
-        }
-
-        }
+}
