@@ -91,7 +91,7 @@ public class TextbookControllerTest {
     }
 
     @Test
-    public void givenNonexistingTextbookId_whenGetRequest_then404isReceived() throws Exception {
+    public void givenNonExistingTextbookId_whenGetRequest_then404isReceived() throws Exception {
 
         // Given
         List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
@@ -263,7 +263,7 @@ public class TextbookControllerTest {
     }
 
     @Test
-    public void givenNonexistingTextbook_whenDelete_then404isReceived() throws Exception {
+    public void givenNonExistingTextbook_whenDelete_then404isReceived() throws Exception {
 
         // Given
         List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());

@@ -1,14 +1,7 @@
 package edu.matko.soric.textbooks.controllers;
 
-import edu.matko.soric.textbooks.entities.Textbook;
-import edu.matko.soric.textbooks.services.TextbookService;
-import edu.matko.soric.textbooks.services.TextbookServiceImpl;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Random;
 
 @Component
 public class JsonObjectsHelper {
@@ -17,9 +10,9 @@ public class JsonObjectsHelper {
 
         JSONObject malformedJSON = new JSONObject();
         malformedJSON.put("title", "KNJIŽEVNOST 1 : čitanka za 1. razred četverogodišnjih strukovnih škola");
-        malformedJSON.put("author", "Matko Sorić");
+        malformedJSON.put("city", "Matko Sorić");
         malformedJSON.put("category", "udžbenik");
-        malformedJSON.put("grade", "1");
+//        malformedJSON.put("grade", "1");
         malformedJSON.put("publisher", "ALFA");
         malformedJSON.put("edition", null);
         malformedJSON.put("price", 90);

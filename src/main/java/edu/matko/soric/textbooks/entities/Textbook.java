@@ -1,8 +1,8 @@
 package edu.matko.soric.textbooks.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -11,7 +11,6 @@ public class Textbook {
 
     @NotNull
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String title;
     String author;
