@@ -55,99 +55,120 @@ public class TextbookControllerTest {
     }
 
     @Test
-    public void listAllTextbooks() throws Exception {
+    public void givenNothing_whenGetTextbooks_then200IsReceived() throws Exception {
 
+        // Given
+
+        // When
         mockMvc.perform(
                 get("/textbooks")
-                .contextPath(contextPath)
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                        .contextPath(contextPath)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andDo(print())
+                // Then
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(content().contentType((MediaType.APPLICATION_JSON_UTF8)))
                 .andExpect(jsonPath("$.page.totalElements", is(textbookService.findAll().size())));
     }
 
     @Test
-    public void getOneTextbook() throws Exception {
+    public void givenExistingTextbookId_whenGetRequest_then200isReceived() throws Exception {
 
+        // Given
         List<Textbook> textbookList = textbookService.findAll();
         randomTextbook = textbookList.get(rand.nextInt(textbookList.size()));
 
+        // When
         mockMvc.perform(
                 get("/textbooks/" + randomTextbook.getId())
-                .contextPath(contextPath)
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                        .contextPath(contextPath)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andDo(print())
+                // Then
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(content().contentType((MediaType.APPLICATION_JSON_UTF8)))
                 .andExpect(content().json(new ObjectMapper().writeValueAsString(randomTextbook)));
     }
 
     @Test
-    public void nonExistingTextbook() throws Exception {
+    public void givenNonexistingTextbookId_whenGetRequest_then404isReceived() throws Exception {
 
+        // Given
         List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
         while (! (nonexistingId > 0)) {
             if(!exclude.contains(rand))
                 nonexistingId = rand.nextInt();
         }
 
+        // When
         mockMvc.perform(
                 get("/textbooks/" + nonexistingId)
-                .contextPath(contextPath)
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                        .contextPath(contextPath)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andDo(print())
+                // Then
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void newTextbookMalformedRequest() throws Exception {
+    public void givenMalformedTextbookJSON_whenCreateTextbook_then400isReceived() throws Exception {
 
+        // Given
+        String malformedTextbookJson = JsonObjectsHelper.malformedJSON().toString();
+
+        // When
         mockMvc.perform(
                 post("/textbooks/new")
                 .contextPath(contextPath)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(JsonObjectsHelper.malformedJSON().toString()))
+                .content(malformedTextbookJson))
                 .andDo(print())
+                // Then
                 .andExpect(status().isBadRequest());
 
     }
 
     @Test
-    public void newTextbookExistingId() throws Exception {
+    public void givenNewTextbookHavingExistingId_whenCreate_then409isReceived() throws Exception {
 
+        // Given
         List<Textbook> textbookList = textbookService.findAll();
         Textbook randomTextbook = textbookList.get(rand.nextInt(textbookList.size()));
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String existingTextbookJSON = ow.writeValueAsString(randomTextbook);
 
+        // When
         mockMvc.perform(
                 post("/textbooks/new")
                         .contextPath(contextPath)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(existingTextbookJSON))
                 .andDo(print())
+                // Then
                 .andExpect(status().isConflict());
     }
 
 
     @Test
-    public void newTextbook() throws Exception {
+    public void givenNewTextbook_whenCreateNewEntry_then201isReceived() throws Exception {
 
+
+        // Given
         List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
         while (! (nonexistingId > 0)) {
             if(!exclude.contains(rand))
                 nonexistingId = rand.nextInt();
         }
-
         JSONObject newTextbookJSON = JsonObjectsHelper.customIdTextbookJSON(nonexistingId);
 
+        // When
         mockMvc.perform(
                 post("/textbooks/new")
                         .contextPath(contextPath)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(newTextbookJSON.toString()))
                 .andDo(print())
+                // Then
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
 
@@ -155,11 +176,12 @@ public class TextbookControllerTest {
 
 
     @Test
-    public void editTextbookMalformedRequestWronPathPathExistingObject() throws Exception {
+    public void givenExistingTextbookAndNonExistingPath_whenEditNonExistingId_then400isReceived() throws Exception {
 
+        // Given
         List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
-        while (! (nonexistingId > 0)) {
-            if(!exclude.contains(rand))
+        while (!(nonexistingId > 0)) {
+            if (!exclude.contains(rand))
                 nonexistingId = rand.nextInt();
         }
 
@@ -168,18 +190,20 @@ public class TextbookControllerTest {
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String existingTextbookJSON = ow.writeValueAsString(randomTextbook);
 
+        // When
         mockMvc.perform(
                 post("/textbooks/edit/" + nonexistingId)
                         .contextPath(contextPath)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(existingTextbookJSON))
                 .andDo(print())
+                // Then
                 .andExpect(status().isBadRequest());
     }
 
 
     @Test
-    public void editTextbookMalformedRequestWrongPathWrongObjectMatchingId() throws Exception {
+    public void givenNonExistingTextbook_whenEditNonExistingId_then404isReceived() throws Exception {
 
         List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
         while (!(nonexistingId > 0)) {
@@ -200,7 +224,7 @@ public class TextbookControllerTest {
 
 
     @Test
-    public void editTextbookMalformedRequestGoodPathGoodObjectIdMismatch() throws Exception {
+    public void givenExistingTextbookAndExistingId_whenEditIdMismatch_then400isReceived() throws Exception {
 
         List<Textbook> textbookList = textbookService.findAll();
         Textbook randomTextbook = textbookList.get(rand.nextInt(textbookList.size()));
@@ -218,45 +242,51 @@ public class TextbookControllerTest {
     }
 
     @Test
-    public void editTextbookGoodRequest() throws Exception {
+    public void givenExistingTextbook_whenEditId_then200isReceived() throws Exception {
 
+        // Given
         List<Textbook> textbookList = textbookService.findAll();
         Textbook randomTextbook = textbookList.get(rand.nextInt(textbookList.size()));
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String randomTextbookJSON = ow.writeValueAsString(randomTextbook);
 
+        // When
         mockMvc.perform(
                 post("/textbooks/edit/" + randomTextbook.getId())
                         .contextPath(contextPath)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(randomTextbookJSON))
                 .andDo(print())
+                // Then
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
     }
 
     @Test
-    public void deleteTextbookNonexistingId() throws Exception {
+    public void givenNonexistingTextbook_whenDelete_then404isReceived() throws Exception {
 
+        // Given
         List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
         while (!(nonexistingId > 0)) {
             if (!exclude.contains(rand))
                 nonexistingId = rand.nextInt();
         }
 
+        // When
         mockMvc.perform(
                 delete("/textbooks/delete/" + nonexistingId)
                         .contextPath(contextPath))
                 .andDo(print())
+                // Then
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
     }
 
 
     @Test
-    public void deleteTextbookGoodRequest() throws Exception {
+    public void givenExistingTextbook_whenDelete_then204isReceived() throws Exception {
 
-        //first, create instance for deletion
+        // Given
         List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
         while (! (nonexistingId > 0)) {
             if(!exclude.contains(rand))
@@ -274,11 +304,12 @@ public class TextbookControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
 
-        //delete
+        // When
         mockMvc.perform(
                 delete("/textbooks/delete/" + newTextbookJSON.get("id"))
                         .contextPath(contextPath))
                 .andDo(print())
+                // Then
                 .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
 
     }

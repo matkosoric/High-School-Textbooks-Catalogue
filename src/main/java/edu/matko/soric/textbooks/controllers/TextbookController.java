@@ -38,6 +38,7 @@ public class TextbookController {
 
     @PostMapping ("/new")
     public ResponseEntity<?> addTextbook (@Valid @RequestBody Textbook textbook, final BindingResult binding) {
+
         if (binding.hasErrors()) {
             throw new ValidationException(binding.getFieldError().getDefaultMessage());
         }
