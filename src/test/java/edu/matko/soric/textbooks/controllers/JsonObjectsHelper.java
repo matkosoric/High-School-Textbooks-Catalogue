@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JsonObjectsHelper {
 
-    static JSONObject malformedJSON () throws Exception{
+    static JSONObject malformedJSON() throws Exception {
 
         JSONObject malformedJSON = new JSONObject();
         malformedJSON.put("title", "KNJIŽEVNOST 1 : čitanka za 1. razred četverogodišnjih strukovnih škola");
@@ -21,7 +21,7 @@ public class JsonObjectsHelper {
 
     }
 
-    static JSONObject customIdTextbookJSON (Integer customId) throws Exception {
+    static JSONObject customIdTextbookJSON(Integer customId) throws Exception {
 
         JSONObject customIdTextbook = new JSONObject();
         customIdTextbook.put("id", customId);

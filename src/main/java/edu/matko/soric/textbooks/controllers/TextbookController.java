@@ -1,7 +1,10 @@
 package edu.matko.soric.textbooks.controllers;
 
-import edu.matko.soric.textbooks.exceptions.*;
 import edu.matko.soric.textbooks.entities.Textbook;
+import edu.matko.soric.textbooks.exceptions.TextbookConflictException;
+import edu.matko.soric.textbooks.exceptions.TextbookIdMismatchException;
+import edu.matko.soric.textbooks.exceptions.TextbookNotFoundException;
+import edu.matko.soric.textbooks.exceptions.ValidationException;
 import edu.matko.soric.textbooks.services.TextbookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,15 +32,16 @@ public class TextbookController {
     ResponseEntity<?> getTextbookById(@PathVariable Long id) {
 
         if (!textbookService.existsById(id)) {
-            throw new TextbookNotFoundException(id.toString());}
+            throw new TextbookNotFoundException(id.toString());
+        }
 
         return ResponseEntity
                 .ok()
                 .body(textbookService.getTextbookById(id));
     }
 
-    @PostMapping ("/new")
-    public ResponseEntity<?> addTextbook (@Valid @RequestBody Textbook textbook, final BindingResult binding) {
+    @PostMapping("/new")
+    public ResponseEntity<?> addTextbook(@Valid @RequestBody Textbook textbook, final BindingResult binding) {
 
         if (binding.hasErrors()) {
             throw new ValidationException(binding.getFieldError().getDefaultMessage());
@@ -52,8 +56,8 @@ public class TextbookController {
                 .body(textbookService.saveTextbook(textbook));
     }
 
-    @PostMapping ("/edit/{id}")
-    public ResponseEntity<?> editTextbook (@Valid @RequestBody Textbook textbook, @PathVariable Long id, final BindingResult binding) {
+    @PostMapping("/edit/{id}")
+    public ResponseEntity<?> editTextbook(@Valid @RequestBody Textbook textbook, @PathVariable Long id, final BindingResult binding) {
 
         if (binding.hasErrors()) {
             throw new ValidationException(binding.getFieldError().getDefaultMessage());
@@ -75,7 +79,7 @@ public class TextbookController {
 
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteTextbook (@Valid @PathVariable Long id) {
+    public ResponseEntity<?> deleteTextbook(@Valid @PathVariable Long id) {
 
         if (!textbookService.existsById(id)) {
             throw new TextbookNotFoundException(id.toString());

@@ -24,9 +24,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -34,18 +32,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = TextbooksCatalogueApp.class)
 public class TextbookControllerTest {
 
-    private MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    private TextbookService textbookService;
-
     Random rand = new Random();
     Textbook randomTextbook;
     Integer nonexistingId = 0;
-
+    private MockMvc mockMvc;
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+    @Autowired
+    private TextbookService textbookService;
     private String contextPath;
 
     @Before
@@ -95,8 +89,8 @@ public class TextbookControllerTest {
 
         // Given
         List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
-        while (! (nonexistingId > 0)) {
-            if(!exclude.contains(rand))
+        while (!(nonexistingId > 0)) {
+            if (!exclude.contains(rand))
                 nonexistingId = rand.nextInt();
         }
 
@@ -119,9 +113,9 @@ public class TextbookControllerTest {
         // When
         mockMvc.perform(
                 post("/textbooks/new")
-                .contextPath(contextPath)
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(malformedTextbookJson))
+                        .contextPath(contextPath)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(malformedTextbookJson))
                 .andDo(print())
                 // Then
                 .andExpect(status().isBadRequest());
@@ -155,8 +149,8 @@ public class TextbookControllerTest {
 
         // Given
         List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
-        while (! (nonexistingId > 0)) {
-            if(!exclude.contains(rand))
+        while (!(nonexistingId > 0)) {
+            if (!exclude.contains(rand))
                 nonexistingId = rand.nextInt();
         }
         JSONObject newTextbookJSON = JsonObjectsHelper.customIdTextbookJSON(nonexistingId);
@@ -288,8 +282,8 @@ public class TextbookControllerTest {
 
         // Given
         List<Long> exclude = textbookService.findAll().stream().map(textbook -> textbook.getId()).collect(Collectors.toList());
-        while (! (nonexistingId > 0)) {
-            if(!exclude.contains(rand))
+        while (!(nonexistingId > 0)) {
+            if (!exclude.contains(rand))
                 nonexistingId = rand.nextInt();
         }
 
