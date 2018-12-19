@@ -7,9 +7,9 @@ It will be accessible on `/textbooks-catalogue-service` path and port `8080`.
 ### Dataset
 
 Textbooks data set was created from the official list of textbooks in Croatian high schools used in the period from 2014 to 2018.
-Sample data is in /src/main/java/resources/textbooks.csv.
+Sample data is in /src/main/java/resources/textbooks_subset.csv.
 
-[Textbooks xml list](https://mzo.hr/hr/popis-udzbenika-pripadajucih-dopunskih-nastavnih-sredstava-za-skolsku-godinu-20142015?cat=209)
+[Original textbooks xml list](https://mzo.hr/hr/popis-udzbenika-pripadajucih-dopunskih-nastavnih-sredstava-za-skolsku-godinu-20142015?cat=209)
 
 
 ### Tools
@@ -33,3 +33,7 @@ password: user
   
 username: admin  
 password: admin  
+
+### Screenshots
+
+

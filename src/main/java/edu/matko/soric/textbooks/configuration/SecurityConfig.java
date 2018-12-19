@@ -12,6 +12,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ *  Service is secured with Basic Http Authentication
+ *
+ *  @author Matko Soric
+ *  @version 1.0
+ */
 
 @Configuration
 @EnableWebSecurity
@@ -32,6 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/**/textbooks/new/**").hasRole("USER")
+                .antMatchers(HttpMethod.DELETE, "/**/textbooks/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST, "/**/textbooks/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET, "/**/textbooks/**").permitAll()
                 .and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())

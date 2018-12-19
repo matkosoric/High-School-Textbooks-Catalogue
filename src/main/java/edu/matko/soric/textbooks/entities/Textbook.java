@@ -5,6 +5,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+/**
+ * @author Matko Soric
+ * @version 1.0
+ */
+
 @Entity
 @Table(name = "textbooks")
 public class Textbook {

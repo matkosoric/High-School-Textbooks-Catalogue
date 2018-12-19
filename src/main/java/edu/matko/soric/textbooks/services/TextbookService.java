@@ -5,6 +5,11 @@ import edu.matko.soric.textbooks.entities.Textbook;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Matko Soric
+ * @version 1.0
+ */
+
 public interface TextbookService {
 
     List<Textbook> findAll();

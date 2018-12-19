@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+/**
+ * @author Matko Soric
+ * @version 1.0
+ */
+
 @RestController
 @RequestMapping("/textbooks")
 public class TextbookController {

@@ -8,6 +8,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Matko Soric
+ * @version 1.0
+ */
+
 @Service
 public class TextbookServiceImpl implements TextbookService {
 
